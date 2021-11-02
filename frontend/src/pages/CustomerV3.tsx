@@ -8,44 +8,31 @@ enum CustomerType {
   SUPER = 'super',
 }
 
-type SuperCustomer = {
+interface BaseCustomer {
   id: number;
-  customer: {
-    id: number;
-    name: string;
-    trust_score: number;
-    address: {
-      district: string;
-      point: string;
+  name: string;
+  trust_score: number;
+  devices: Array<{
+    os: {
+      name: string;
+      version: string;
     };
-    customer_type: CustomerType.SUPER;
-    devices: Array<{
-      os: {
-        name: string;
-        version: string;
-      };
-      use_count: number;
-    }>;
-  };
-};
+    use_count: number;
+  }>;
+}
 
-type NormalCustomer = {
-  id: number;
-  customer: {
-    id: number;
-    name: string;
-    trust_score: number;
-    address: string;
-    customer_type: CustomerType.NORMAL;
-    devices: Array<{
-      os: {
-        name: string;
-        version: string;
-      };
-      use_count: number;
-    }>;
+interface SuperCustomer extends BaseCustomer {
+  address: {
+    district: string;
+    point: string;
   };
-};
+  customer_type: CustomerType.SUPER;
+}
+
+interface NormalCustomer extends BaseCustomer {
+  address: string;
+  customer_type: CustomerType.NORMAL;
+}
 
 type Customer = SuperCustomer | NormalCustomer;
 
@@ -73,8 +60,10 @@ export const CustomerV3 = () => {
       //   });
 
       try {
-        const res = await axios.get<Customer>(endpoint);
-        setCustomer(res.data);
+        const res = await axios.get<{ id: number; customer: Customer }>(
+          endpoint,
+        );
+        setCustomer(res.data.customer);
       } catch (error) {
         console.log((error as AxiosError).response?.data.message);
         setErrorMessage((error as AxiosError).response?.data.message);
@@ -92,20 +81,20 @@ export const CustomerV3 = () => {
       {errorMessage && <p>{errorMessage}</p>}
       {customer && (
         <>
-          <div>customer id: {customer.customer.id}</div>
-          <div>trust_score: {customer.customer.trust_score}</div>
-          {customer.customer.customer_type === CustomerType.SUPER ? (
+          <div>customer id: {customer.id}</div>
+          <div>trust_score: {customer.trust_score}</div>
+          {customer.customer_type === CustomerType.SUPER ? (
             <>
-              <div>address point: {customer.customer.address.point}</div>
-              <div>address district: {customer.customer.address.district}</div>
+              <div>address point: {customer.address.point}</div>
+              <div>address district: {customer.address.district}</div>
             </>
           ) : (
-            <div>address: {customer.customer.address}</div>
+            <div>address: {customer.address}</div>
           )}
           <div>
             devices:
             <ul>
-              {customer.customer.devices.map((device) => (
+              {customer.devices.map((device) => (
                 <li
                   key={`device-${device.os.name}`}
                 >{`${device.os.name} ${device.os.version} ${device.use_count}`}</li>
