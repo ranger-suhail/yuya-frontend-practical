@@ -4,9 +4,9 @@ import axios, { AxiosError } from 'axios';
 import { getQueryId } from '../utils';
 
 type Customer = {
-  id: string;
+  id: number;
   customer: {
-    id: string;
+    id: number;
     name: string;
     trust_score: number;
     address: string;

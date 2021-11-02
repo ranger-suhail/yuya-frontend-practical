@@ -4,9 +4,9 @@ import axios from 'axios';
 import { getQueryId } from '../utils';
 
 type Customer = {
-  id: string;
+  id: number;
   customer: {
-    id: string;
+    id: number;
     name: string;
     trust_score: number;
     address: string;
@@ -14,10 +14,10 @@ type Customer = {
       os: {
         name: string;
         version: string;
-      }
+      };
       use_count: number;
-    }>
-  }
+    }>;
+  };
 };
 
 export const CustomerV1 = () => {
@@ -35,19 +35,18 @@ export const CustomerV1 = () => {
 
       const res = await axios.get<Customer>(endpoint);
 
-      console.log(res.data)
+      console.log(res.data);
 
-      setCustomer(res.data)
+      setCustomer(res.data);
     };
     if (id !== null) {
       fetchCustomer(id);
     }
   }, [id]);
 
-  if (!customer) return null
+  if (!customer) return null;
 
-  console.log(customer)
-
+  console.log(customer);
 
   return (
     <div>
@@ -59,7 +58,7 @@ export const CustomerV1 = () => {
       <div>
         devices:
         <ul>
-          {customer.customer.devices.map(device => (
+          {customer.customer.devices.map((device) => (
             <li>{`${device.os.name} ${device.os.version} ${device.use_count}`}</li>
           ))}
         </ul>
