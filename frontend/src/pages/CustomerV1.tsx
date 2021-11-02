@@ -59,7 +59,9 @@ export const CustomerV1 = () => {
         devices:
         <ul>
           {customer.customer.devices.map((device) => (
-            <li>{`${device.os.name} ${device.os.version} ${device.use_count}`}</li>
+            <li
+              key={`device-${device.os.name}`}
+            >{`${device.os.name} ${device.os.version} ${device.use_count}`}</li>
           ))}
         </ul>
       </div>
