@@ -1,8 +1,28 @@
-import { useEffect } from "react";
-import { getQueryId } from "../utils";
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+
+import { getQueryId } from '../utils';
+
+type Customer = {
+  id: string;
+  customer: {
+    id: string;
+    name: string;
+    trust_score: number;
+    address: string;
+    devices: Array<{
+      os: {
+        name: string;
+        version: string;
+      }
+      use_count: number;
+    }>
+  }
+};
 
 export const CustomerV1 = () => {
   const id = getQueryId(window.location.search);
+  const [customer, setCustomer] = useState<Customer>();
 
   // Question 1: Please use fetch or another library and fetch the customer details with the id from the url.
   // Then, display the customer details in the page as an organized HTML.
@@ -12,17 +32,38 @@ export const CustomerV1 = () => {
     const fetchCustomer = async (customerId: string) => {
       const endpoint = `http://localhost:3001/api/v1/customers/${customerId}`;
       // TODO: implement
+
+      const res = await axios.get<Customer>(endpoint);
+
+      console.log(res.data)
+
+      setCustomer(res.data)
     };
     if (id !== null) {
       fetchCustomer(id);
     }
   }, [id]);
 
+  if (!customer) return null
+
+  console.log(customer)
+
+
   return (
     <div>
       <h1>CustomerV1</h1>
       <div>id: {id}</div>
-      <div></div>
+      <div>customer id: {customer.customer.id}</div>
+      <div>trust_score: {customer.customer.trust_score}</div>
+      <div>address: {customer.customer.address}</div>
+      <div>
+        devices:
+        <ul>
+          {customer.customer.devices.map(device => (
+            <li>{`${device.os.name} ${device.os.version} ${device.use_count}`}</li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

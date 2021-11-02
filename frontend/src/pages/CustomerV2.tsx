@@ -1,14 +1,75 @@
-// Question 2. Please copy and paste your CustomerV1 code.
-// Then, handle the error cases. In V2, the server randomly returns an error with message.
-// When the server responds with an error, display the error message to the user.
-// Also, fetching might fail. In that case, display an error message "Failed to fetch the customer details" to the user.
-//
-// Case 1: 500 Internal Server Error
-// Case 2: 404 Not Found
-// Case 3: Connection error (eg timeout). "Failed to fetch the customer details"
-//
-// V2 endpoint is `http://localhost:3001/api/v2/customers/${customerId}`
+import { useState, useEffect } from 'react';
+import axios, { AxiosError } from 'axios';
+
+import { getQueryId } from '../utils';
+
+type Customer = {
+  id: string;
+  customer: {
+    id: string;
+    name: string;
+    trust_score: number;
+    address: string;
+    devices: Array<{
+      os: {
+        name: string;
+        version: string;
+      };
+      use_count: number;
+    }>;
+  };
+};
 
 export const CustomerV2 = () => {
-  return <h1>CustomerV2</h1>;
+  const id = getQueryId(window.location.search);
+  const [customer, setCustomer] = useState<Customer>();
+  const [errorMessage, setErrorMessage] = useState('');
+
+  // Question 1: Please use fetch or another library and fetch the customer details with the id from the url.
+  // Then, display the customer details in the page as an organized HTML.
+  // You don't need to add beautiful styling.
+  // For Question 1, you don't need to worry about error handling.
+  useEffect(() => {
+    const fetchCustomer = async (customerId: string) => {
+      const endpoint = `http://localhost:3001/api/v2/customers/${customerId}`;
+      // TODO: implement
+      axios
+        .get<Customer>(endpoint)
+        .then((res) => {
+          setCustomer(res.data);
+        })
+        .catch((error) => {
+          console.log(error);
+          setErrorMessage((error as AxiosError).response?.data.message);
+        });
+    };
+    if (id !== null) {
+      fetchCustomer(id);
+    }
+  }, [id]);
+
+  return (
+    <div>
+      <h1>CustomerV2</h1>
+      <div>id: {id}</div>
+      {errorMessage && <p>{errorMessage}</p>}
+      {customer && (
+        <>
+          <div>customer id: {customer.customer.id}</div>
+          <div>trust_score: {customer.customer.trust_score}</div>
+          <div>address: {customer.customer.address}</div>
+          <div>
+            devices:
+            <ul>
+              {customer.customer.devices.map((device) => (
+                <li
+                  key={`devce-${device.os.name}`}
+                >{`${device.os.name} ${device.os.version} ${device.use_count}`}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
+    </div>
+  );
 };
