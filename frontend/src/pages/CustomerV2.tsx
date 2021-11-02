@@ -33,15 +33,23 @@ export const CustomerV2 = () => {
     const fetchCustomer = async (customerId: string) => {
       const endpoint = `http://localhost:3001/api/v2/customers/${customerId}`;
       // TODO: implement
-      axios
-        .get<Customer>(endpoint)
-        .then((res) => {
-          setCustomer(res.data);
-        })
-        .catch((error) => {
-          console.log(error);
-          setErrorMessage((error as AxiosError).response?.data.message);
-        });
+      // axios
+      //   .get<Customer>(endpoint)
+      //   .then((res) => {
+      //     setCustomer(res.data);
+      //   })
+      //   .catch((error) => {
+      //     console.log(error);
+      //     setErrorMessage((error as AxiosError).response?.data.message);
+      //   });
+
+      try {
+        const res = await axios.get<Customer>(endpoint);
+        setCustomer(res.data);
+      } catch (error) {
+        console.log((error as AxiosError).response?.data.message);
+        setErrorMessage((error as AxiosError).response?.data.message);
+      }
     };
     if (id !== null) {
       fetchCustomer(id);
